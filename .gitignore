@@ -1,0 +1,6 @@
+# Ignore all CSV files except heart.csv
+*.csv
+!heart.csv
+
+# Ignore all PNG files
+*.png
