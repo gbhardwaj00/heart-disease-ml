@@ -150,6 +150,8 @@ def main(file_path):
     # Save the final DataFrame to a CSV file
     save_to_csv(normalized_heart_df, 'normalized_heart_data.csv')
 
+    
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python script.py <heart_csv_file>")

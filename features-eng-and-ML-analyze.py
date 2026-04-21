@@ -73,6 +73,7 @@ def gradient_boosting_clf(X_train, X_valid, y_train, y_valid):
     print(f"Accuracy of the Gradient Boosting Classifier model: {accuracy_gbc}")
     print("Classification Report:")
     print(report_gbc)
+    return GBCmodel
 
 def decision_tree_clf(X_train, X_valid, y_train, y_valid):
     DTModel = DecisionTreeClassifier(max_depth=4, min_samples_leaf=4)
@@ -89,6 +90,7 @@ def decision_tree_clf(X_train, X_valid, y_train, y_valid):
     print(f"Accuracy of the Decision Tree model: {accuracy_dt}")
     print("Classification Report:")
     print(report_dt)
+    return DTModel
 
 def mlp_clasifier(X_train, X_valid, y_train, y_valid):
     MLPModel = MLPClassifier(hidden_layer_sizes=50, max_iter=1000)
@@ -105,6 +107,7 @@ def mlp_clasifier(X_train, X_valid, y_train, y_valid):
     print(f"Accuracy of the MLP Classifier model: {accuracy_mlp}")
     print("Classification Report:")
     print(report_mlp)
+    return MLPModel
 
 def random_forest_clf(X_train, X_valid, y_train, y_valid):
     RFModel = RandomForestClassifier(n_estimators=150, max_depth=15, min_samples_leaf=5)
@@ -121,6 +124,7 @@ def random_forest_clf(X_train, X_valid, y_train, y_valid):
     print(f"Accuracy of the Random Forest Classifier model: {accuracy_rf}")
     print("Classification Report:")
     print(report_rf)
+    return RFModel
 
 def knn_clf(X_train, X_valid, y_train, y_valid):
     KNNModel = KNeighborsClassifier(n_neighbors=10)
@@ -137,6 +141,29 @@ def knn_clf(X_train, X_valid, y_train, y_valid):
     print(f"Accuracy of the K Neighbors Classifier model: {accuracy_knn}")
     print("Classification Report:")
     print(report_knn)
+    return KNNModel
+
+def plot_train_and_valiadation_scores(GBModel, DTModel, MLPModel, RFModel, KNNModel, X_train, y_train, X_valid, y_valid):
+    results = pd.DataFrame({
+    'Model': ['Gradient Boosting', 'Decision Tree', 'MLP Classifier', 'Random Forest', 'K Neighbors'],
+    'Train Accuracy': [GBModel.score(X_train, y_train), DTModel.score(X_train, y_train),
+                       MLPModel.score(X_train, y_train), RFModel.score(X_train, y_train),
+                       KNNModel.score(X_train, y_train)],
+    'Validation Accuracy': [GBModel.score(X_valid, y_valid), DTModel.score(X_valid, y_valid),
+                             MLPModel.score(X_valid, y_valid), RFModel.score(X_valid, y_valid),
+                             KNNModel.score(X_valid, y_valid)]
+    })
+
+    results_melted = pd.melt(results, id_vars='Model', var_name='Dataset', value_name='Accuracy')
+
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x='Model', y='Accuracy', hue='Dataset', data=results_melted, palette='viridis')
+    plt.title('Train and Validation Scores for Models Used')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Model')
+    plt.ylim(0, 1)
+    plt.legend(loc='lower right')
+    plt.savefig('train-and-validation-scores.png')
 
 def main(file_path):
     normalized_df = read_data(file_path)
@@ -158,19 +185,22 @@ def main(file_path):
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.3, random_state=42)
 
     # Gradient Boosting Classifier
-    gradient_boosting_clf(X_train, X_valid, y_train, y_valid)
+    GBModel = gradient_boosting_clf(X_train, X_valid, y_train, y_valid)
 
     # Decision Tree Classifier
-    decision_tree_clf(X_train, X_valid, y_train, y_valid)
+    DTModel = decision_tree_clf(X_train, X_valid, y_train, y_valid)
 
     # MLP Classifier
-    mlp_clasifier(X_train, X_valid, y_train, y_valid)
+    MLPModel = mlp_clasifier(X_train, X_valid, y_train, y_valid)
 
     # Random Forest Classifier
-    random_forest_clf(X_train, X_valid, y_train, y_valid)
+    RFModel = random_forest_clf(X_train, X_valid, y_train, y_valid)
 
     # KNN Classifier
-    knn_clf(X_train, X_valid, y_train, y_valid)
+    KNNModel = knn_clf(X_train, X_valid, y_train, y_valid)
+
+    # Visualizing the feature importances
+    plot_train_and_valiadation_scores(GBModel, DTModel, MLPModel, RFModel, KNNModel, X_train, y_train, X_valid, y_valid)
 
 
 if __name__ == "__main__":
